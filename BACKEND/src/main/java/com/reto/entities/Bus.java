@@ -7,8 +7,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -30,7 +32,8 @@ public class Bus
     private String placa;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime fechaCreacion;
+    @DateTimeFormat(pattern="yyyy-MM-dd",iso= ISO.DATE)
+    private LocalDate fechaCreacion;
 
     @Column(columnDefinition = "TEXT")
     private String caracteristicas;
@@ -45,7 +48,7 @@ public class Bus
 
     @PrePersist
     public void onPrePersist() {
-        this.fechaCreacion = LocalDateTime.now();
+        this.fechaCreacion = LocalDate.now();
     }
 
 }
