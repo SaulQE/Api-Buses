@@ -69,7 +69,7 @@ public class BusController
             return validar(result);
         }
 
-        Optional<Marca> optionalMarca = marcaService.findById(busDTO.getMarca());
+        Optional<Marca> optionalMarca = marcaService.findById((Integer) busDTO.getMarca());
         if (optionalMarca.isEmpty()) {
             return ResponseEntity.badRequest().body("Marca no encontrada");
         }
@@ -88,7 +88,7 @@ public class BusController
 
         return busService.findById(busId)
                 .map(existingBus -> {
-                    Optional<Marca> optionalMarca = marcaService.findById(busDTO.getMarca());
+                    Optional<Marca> optionalMarca = marcaService.findById((Integer) busDTO.getMarca());
                     if (optionalMarca.isEmpty()) {
                         return ResponseEntity.badRequest().body("Marca no encontrada");
                     }

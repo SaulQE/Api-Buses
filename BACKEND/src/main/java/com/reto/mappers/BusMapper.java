@@ -7,15 +7,15 @@ import com.reto.entities.Marca;
 public class BusMapper
 {
     public static BusDTO toDTO(Bus bus) {
-        BusDTO dto = new BusDTO();
-        dto.setBusId(bus.getBusId());
-        dto.setNumeroBus(bus.getNumeroBus());
-        dto.setPlaca(bus.getPlaca());
-        dto.setFechaCreacion(bus.getFechaCreacion());
-        dto.setCaracteristicas(bus.getCaracteristicas());
-        dto.setEstado(bus.getEstado());
-        dto.setMarca(bus.getMarca().getMarcaId());
-        return dto;
+        return new BusDTO(
+                bus.getBusId(),
+                bus.getNumeroBus(),
+                bus.getPlaca(),
+                bus.getFechaCreacion(),
+                bus.getCaracteristicas(),
+                bus.getMarca().getNombre(),
+                bus.getEstado()
+        );
     }
 
     public static Bus toEntity(BusDTO dto, Marca marca) {
