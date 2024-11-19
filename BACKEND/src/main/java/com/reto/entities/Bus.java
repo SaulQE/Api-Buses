@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -30,14 +29,13 @@ public class Bus
     @Column(nullable = false, unique = true, length = 10)
     private String placa;
 
-    @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
     @Column(columnDefinition = "TEXT")
     private String caracteristicas;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "marca_id", nullable = false)
     private Marca marca;
 
@@ -45,5 +43,9 @@ public class Bus
     @Column(nullable = false)
     private EstadoBus estado = EstadoBus.ACTIVO;
 
+    @PrePersist
+    public void onPrePersist() {
+        this.fechaCreacion = LocalDateTime.now();
+    }
 
 }
