@@ -23,6 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bus")
+@CrossOrigin(origins = "http://localhost:5173")
 public class BusController
 {
 
