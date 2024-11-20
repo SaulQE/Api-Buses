@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/bus")
 @CrossOrigin(origins = "http://localhost:5173")
-public class BusController
-{
+public class BusController {
 
     @Autowired
     private BusService busService;
@@ -34,6 +34,7 @@ public class BusController
     private MarcaService marcaService;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<PaginatedResponse<BusDTO>> getAllBuses(Pageable pageable) {
 
         Page<Bus> busPage = busService.findAll(pageable);
@@ -57,6 +58,7 @@ public class BusController
     }
 
     @GetMapping("/{busId}")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<BusDTO> getBusById(@PathVariable Integer busId) {
         return busService.findById(busId)
                 .map(bus -> ResponseEntity.ok(BusMapper.toDTO(bus)))
@@ -64,6 +66,7 @@ public class BusController
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<?> saveBus(@Valid @RequestBody BusDTO busDTO, BindingResult result) {
         /* Si tiene errores */
         if (result.hasErrors()) {
@@ -81,6 +84,7 @@ public class BusController
     }
 
     @PutMapping("/{busId}")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<?> editBus(@Valid @RequestBody BusDTO busDTO, BindingResult result, @PathVariable Integer busId) {
         /* Si tiene errores */
         if (result.hasErrors()) {
@@ -103,6 +107,7 @@ public class BusController
     }
 
     @DeleteMapping("/{busId}")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<?> deleteBus(@PathVariable Integer busId) {
         Optional<Bus> optionalBus = busService.findById(busId);
         if (optionalBus.isPresent()) {

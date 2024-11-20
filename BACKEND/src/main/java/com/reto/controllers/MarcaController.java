@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +23,13 @@ public class MarcaController {
     private MarcaService marcaService;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN') or hasAnyAuthority('SCOPE_BASIC')")
     public ResponseEntity<?> getAllMarcas(){
         return ResponseEntity.ok(marcaService.findAll());
     }
     
     @GetMapping("/{marcaId}")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN') or hasAnyAuthority('SCOPE_BASIC')")
     public ResponseEntity<?> getMarcaById(@PathVariable Integer marcaId){
         return marcaService.findById(marcaId)
                 .map(ResponseEntity::ok)
@@ -34,6 +37,7 @@ public class MarcaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<?> saveMarca(@Valid @RequestBody Marca marca, BindingResult result) {
         /* Si tiene errores */
         if (result.hasErrors()) {
@@ -44,6 +48,7 @@ public class MarcaController {
     }
 
     @PutMapping("/{marcaId}")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<?> editMarca(@Valid @RequestBody Marca newMarca, BindingResult result, @PathVariable Integer marcaId) {
         /* Si tiene errores */
         if (result.hasErrors()) {
@@ -59,6 +64,7 @@ public class MarcaController {
     }
 
     @DeleteMapping("/{marcaId}")
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     public ResponseEntity<?> deleteMarca(@PathVariable Integer marcaId) {
         Optional<Marca> optionalMarca = marcaService.findById(marcaId);
         if (optionalMarca.isPresent()) {
