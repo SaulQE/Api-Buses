@@ -17,7 +17,11 @@ export const getBuses = async (
 	size = 5,
 ): Promise<PaginatedResponse<Bus>> => {
 	try {
-		const response = await fetch(`${API_URL}/bus?page=${page}&size=${size}`);
+		const response = await fetch(`${API_URL}/bus?page=${page}&size=${size}`, {
+			method: 'GET',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+		});
 
 		// Validar la respuesta
 		if (!response.ok) {
@@ -34,7 +38,11 @@ export const getBuses = async (
 // TODO: 2. Obtener un bus por su ID
 export const getBusById = async (id: number): Promise<Bus> => {
 	try {
-		const response = await fetch(`${API_URL}/bus/${id}`);
+		const response = await fetch(`${API_URL}/bus/${id}`, {
+			method: 'GET',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+		});
 
 		if (!response.ok) {
 			throw new Error('Error al obtener el bus');
