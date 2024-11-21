@@ -35,10 +35,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [user, setUser] = useState<User>(initialUser);
 
 	useEffect(() => {
+		// cargar componente, obtener el token
 		const token = localStorage.getItem('accessToken');
 		if (token) {
 			try {
 				const decoded = jwtDecode<JwtPayload>(token);
+				// Validar la expiración del token
 				if (decoded.exp * 1000 > Date.now()) {
 					setIsAuthenticated(true);
 					setUser({
@@ -71,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			const data = await response.json();
 			const decoded = jwtDecode<JwtPayload>(data.accessToken);
 
+			// Guardar el token de acceso en el localStorage
 			localStorage.setItem('accessToken', data.accessToken);
 
 			setIsAuthenticated(true);
@@ -85,21 +88,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	};
 
 	const logout = () => {
+		// Limpiar el token al cerrar sesión
 		localStorage.removeItem('accessToken');
-
 		setIsAuthenticated(false);
 		setUser(initialUser);
 	};
 
 	return (
-		<AuthContext.Provider
-			value={{
-				isAuthenticated,
-				user,
-				login,
-				logout,
-			}}
-		>
+		<AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);

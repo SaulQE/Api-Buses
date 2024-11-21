@@ -3,10 +3,9 @@ import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 interface PaginacionProps {
 	currentPage: number;
 	totalPages: number;
-	onPageChange: (page: number) => void; // Funcion que se ejecuta al cambiar de pag.
+	onPageChange: (page: number) => void;
 }
 
-// Componente de paginacion
 export const Paginacion = ({
 	currentPage,
 	totalPages,

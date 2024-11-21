@@ -11,7 +11,7 @@ function App() {
 	return (
 		<AuthProvider>
 			<BrowserRouter>
-				{/* Navbar estará siempre visible */}
+				{/* Navbar siempre visible */}
 				<Navbar />
 				<Routes>
 					<Route path='/login' element={<Login />} />
