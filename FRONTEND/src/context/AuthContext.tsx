@@ -1,27 +1,66 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
+
+interface JwtPayload {
+	sub: string;
+	scope: string[];
+	exp: number;
+}
+
+interface User {
+	id: string | null;
+	roles: string[];
+}
 
 interface AuthContextType {
 	isAuthenticated: boolean;
-	username: string | null;
+	user: User;
 	login: (username: string, password: string) => Promise<void>;
 	logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const initialUser: User = { id: null, roles: [] };
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthContext = createContext<AuthContextType>({
+	isAuthenticated: false,
+	user: initialUser,
+	login: async () => {},
+	logout: () => {},
+});
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+	children,
+}) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [username, setUsername] = useState<string | null>(null);
+	const [user, setUser] = useState<User>(initialUser);
+
+	useEffect(() => {
+		const token = localStorage.getItem('accessToken');
+		if (token) {
+			try {
+				const decoded = jwtDecode<JwtPayload>(token);
+				if (decoded.exp * 1000 > Date.now()) {
+					setIsAuthenticated(true);
+					setUser({
+						id: decoded.sub,
+						roles: decoded.scope,
+					});
+				} else {
+					logout();
+				}
+			} catch (error) {
+				logout();
+			}
+		}
+	}, []);
 
 	const login = async (username: string, password: string) => {
 		try {
-			const response = await fetch('http://localhost:8888/api/auth/login', {
+			const response = await fetch('http://localhost:8888/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: 'Basic ' + btoa(`${username}:${password}`),
 				},
-				credentials: 'include',
 				body: JSON.stringify({ username, password }),
 			});
 
@@ -30,9 +69,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			}
 
 			const data = await response.json();
+			const decoded = jwtDecode<JwtPayload>(data.accessToken);
+
+			localStorage.setItem('accessToken', data.accessToken);
+
 			setIsAuthenticated(true);
-			setUsername(data.username);
-			return data;
+			setUser({
+				id: decoded.sub,
+				roles: decoded.scope,
+			});
 		} catch (error) {
 			console.error('Login error:', error);
 			throw error;
@@ -40,12 +85,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const logout = () => {
+		localStorage.removeItem('accessToken');
+
 		setIsAuthenticated(false);
-		setUsername(null);
+		setUser(initialUser);
 	};
 
 	return (
-		<AuthContext.Provider value={{ isAuthenticated, username, login, logout }}>
+		<AuthContext.Provider
+			value={{
+				isAuthenticated,
+				user,
+				login,
+				logout,
+			}}
+		>
 			{children}
 		</AuthContext.Provider>
 	);
@@ -53,6 +107,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
 	const context = useContext(AuthContext);
-	if (!context) throw new Error('useAuth must be used within AuthProvider');
+	if (context === undefined) {
+		throw new Error('useAuth debe usarse dentro de un AuthProvider');
+	}
 	return context;
 };

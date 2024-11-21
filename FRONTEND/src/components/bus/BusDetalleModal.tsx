@@ -1,4 +1,4 @@
-import { Bus, EstadoBus } from '../interfaces/Bus';
+import { Bus, EstadoBus } from '../../interfaces/Bus';
 import { FaTimes } from 'react-icons/fa';
 
 interface BusDetlleModalProps {
@@ -7,7 +7,6 @@ interface BusDetlleModalProps {
 }
 
 export const BusDetalleModal = ({ bus, onClose }: BusDetlleModalProps) => {
-	// No renderizar nada si no hay bus seleccionado
 	if (!bus) return null;
 
 	return (

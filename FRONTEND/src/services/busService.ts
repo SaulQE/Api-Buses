@@ -11,7 +11,15 @@ export interface PaginatedResponse<T> {
 	number: number;
 }
 
-// TODO: 1. Obtener lista de buses con paginación
+const getAuthHeaders = () => {
+	const token = localStorage.getItem('accessToken');
+	return {
+		'Content-Type': 'application/json',
+		...(token ? { Authorization: `Bearer ${token}` } : {}),
+	};
+};
+
+// 1. Obtener lista de buses con paginación
 export const getBuses = async (
 	page = 0,
 	size = 5,
@@ -19,12 +27,16 @@ export const getBuses = async (
 	try {
 		const response = await fetch(`${API_URL}/bus?page=${page}&size=${size}`, {
 			method: 'GET',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: getAuthHeaders(),
 		});
 
 		// Validar la respuesta
 		if (!response.ok) {
+			if (response.status === 401) {
+				localStorage.removeItem('accessToken');
+				window.location.href = '/login';
+				throw new Error('Unauthorized');
+			}
 			throw new Error('Error al obtener los buses');
 		}
 
@@ -35,16 +47,20 @@ export const getBuses = async (
 	}
 };
 
-// TODO: 2. Obtener un bus por su ID
+// 2. Obtener un bus por su ID
 export const getBusById = async (id: number): Promise<Bus> => {
 	try {
 		const response = await fetch(`${API_URL}/bus/${id}`, {
 			method: 'GET',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: getAuthHeaders(),
 		});
 
 		if (!response.ok) {
+			if (response.status === 401) {
+				localStorage.removeItem('accessToken');
+				window.location.href = '/login';
+				throw new Error('Unauthorized');
+			}
 			throw new Error('Error al obtener el bus');
 		}
 
@@ -55,16 +71,21 @@ export const getBusById = async (id: number): Promise<Bus> => {
 	}
 };
 
-// TODO: 3. Crear un nuevo bus
-export const createBus = async (bus: Omit<Bus, 'id'>): Promise<Bus> => {
+// 3. Crear un nuevo bus
+export const createBus = async (bus: Omit<Bus, 'busId'>): Promise<Bus> => {
 	try {
 		const response = await fetch(`${API_URL}/bus`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: getAuthHeaders(),
 			body: JSON.stringify(bus),
 		});
 
 		if (!response.ok) {
+			if (response.status === 401) {
+				localStorage.removeItem('accessToken');
+				window.location.href = '/login';
+				throw new Error('Unauthorized');
+			}
 			throw new Error('Error al crear el bus');
 		}
 
@@ -75,19 +96,24 @@ export const createBus = async (bus: Omit<Bus, 'id'>): Promise<Bus> => {
 	}
 };
 
-// TODO: 4. Actualizar un bus
+// 4. Actualizar un bus
 export const updateBus = async (
 	id: number,
-	bus: Partial<Bus>, // Solo se envian las propiedades a actualizar
+	bus: Partial<Bus>,
 ): Promise<Bus> => {
 	try {
 		const response = await fetch(`${API_URL}/bus/${id}`, {
 			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
+			headers: getAuthHeaders(),
 			body: JSON.stringify(bus),
 		});
 
 		if (!response.ok) {
+			if (response.status === 401) {
+				localStorage.removeItem('accessToken');
+				window.location.href = '/login';
+				throw new Error('Unauthorized');
+			}
 			throw new Error('Error al actualizar el bus');
 		}
 
@@ -98,14 +124,21 @@ export const updateBus = async (
 	}
 };
 
-// TODO: 5. Eliminar un bus
+// 5. Eliminar un bus
 export const deleteBus = async (id: number): Promise<void> => {
 	try {
 		const response = await fetch(`${API_URL}/bus/${id}`, {
 			method: 'DELETE',
+			headers: getAuthHeaders(),
 		});
 
 		if (!response.ok) {
+			if (response.status === 401) {
+				localStorage.removeItem('accessToken');
+				window.location.href = '/login';
+				throw new Error('Unauthorized');
+			}
+
 			const errorData = await response.json().catch(() => null);
 			throw new Error(errorData?.message || 'Error al eliminar el bus');
 		}

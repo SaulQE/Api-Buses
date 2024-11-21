@@ -1,0 +1,28 @@
+package com.reto.entities;
+
+import com.reto.utils.Role;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "usuarios")
+public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
+
+    @Column(unique = true)
+    private String username;
+    @Email
+    private String email;
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+}
